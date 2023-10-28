@@ -1,0 +1,27 @@
+namespace:
+  name: test
+
+service:
+  port: 4111
+  targetPort: 3111
+  protocol: TCP
+  type: ClusterIP
+
+image:
+  repository: techtrends
+  tag: latest
+  pullPolicy: IfNotPresent
+
+replicaCount: 1
+
+resources:
+  requests:
+    memory: 64Mi
+    cpu: 250m
+  limits:
+    memory: 64Mi
+    cpu: 250m
+
+containerPort: 3111
+livenessProbe: /healthz
+readinessProbe: /healthz
