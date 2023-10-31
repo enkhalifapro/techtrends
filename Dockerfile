@@ -9,4 +9,6 @@ COPY . .
 
 EXPOSE 3111
 
+CMD [ "python", "./init_db.py" ]
+
 CMD [ "python", "./app.py" ]

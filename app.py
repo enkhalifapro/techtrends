@@ -1,13 +1,17 @@
-import logging
+import sys, logging
 import sqlite3
 from flask import Flask, jsonify, render_template, request, url_for, redirect, flash
+
+stdout_hdlr = logging.StreamHandler(sys.stdout)
+stderr_hdlr = logging.StreamHandler(sys.stderr)
 
 logging.basicConfig(
     format='%(asctime)s %(levelname)-8s %(message)s',
     level=logging.DEBUG,
     datefmt='%Y-%m-%d %H:%M:%S')
 logger = logging.getLogger('app')
-
+logger.addHandler(stdout_hdlr)
+logger.addHandler(stderr_hdlr)
 conn_count = 0
 
 
@@ -58,6 +62,7 @@ def index():
 def post(post_id):
     post = get_post(post_id)
     if post is None:
+        logger.error(f'not found post with id "{post_id}" page retrieved!')
         return render_template('404.html'), 404
     else:
         msg = 'Article "{title}" retrieved!'
@@ -68,6 +73,7 @@ def post(post_id):
 # Define the About Us page
 @app.route('/about')
 def about():
+    logger.info('"About Us" page retrieved!')
     return render_template('about.html')
 
 
@@ -77,7 +83,6 @@ def create():
     if request.method == 'POST':
         title = request.form['title']
         content = request.form['content']
-
         if not title:
             flash('Title is required!')
         else:
@@ -86,7 +91,7 @@ def create():
                                (title, content))
             connection.commit()
             connection.close()
-
+            logger.info(f' a new post with title {title} created')
             return redirect(url_for('index'))
 
     return render_template('create.html')
